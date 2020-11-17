@@ -1013,6 +1013,285 @@ struct npc_aoe_damage_triggerAI : public ScriptedAI, public TimerManager
     }
 };
 
+enum
+{
+    GOSSIP_TEXT_CRYSTAL = 50400,
+    GOSSIP_TEXT_CRYSTAL_2 = 50401,
+};
+
+bool GossipHello_npc_enchantment_crystal(Player* pPlayer, Creature* pCreature)
+{
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Head", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Shoulder", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Cloak", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Chest", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Wrist", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Hands", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Legs", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 7);
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Feet", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 8);
+    //pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Ring", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9);
+    //pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Ring2", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 10);
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "2H Weapon", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Mainhand Weapon", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 12);
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Offhand", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 14);
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Ranged", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 16);
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Shield", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 17);
+
+    pPlayer->PlayerTalkClass->SendGossipMenu(GOSSIP_TEXT_CRYSTAL, pCreature->GetObjectGuid());
+    return true;
+}
+
+bool GossipSelect_npc_enchantment_crystal(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
+{
+    if (uiAction == GOSSIP_ACTION_INFO_DEF + 1)
+    {
+        switch (pPlayer->getClass())
+        {
+            case CLASS_PALADIN:
+                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "10 stamina/7 defense/24 healing", EQUIPMENT_SLOT_HEAD, 24160);
+                break;
+            case CLASS_MAGE:
+                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "18 spell damage and healing/1% spell hit", EQUIPMENT_SLOT_HEAD, 24164);
+                break;
+            case CLASS_PRIEST:
+                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "10 stamina/4 mp5/24 healing", EQUIPMENT_SLOT_HEAD, 24167);
+                break;
+            case CLASS_WARLOCK:
+                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "10 stamina/18 spell damage and healing", EQUIPMENT_SLOT_HEAD, 24165);
+                break;
+            case CLASS_DRUID:
+                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "10 stamina/10 intellect/24 healing", EQUIPMENT_SLOT_HEAD, 24168);
+                break;
+            case CLASS_HUNTER:
+                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "24 ranged attack power/10 stamina/1% crit", EQUIPMENT_SLOT_HEAD, 24162);
+                break;
+            case CLASS_SHAMAN:
+                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "15 intellect/13 spell damage and healing", EQUIPMENT_SLOT_HEAD, 24163);
+                break;
+            case CLASS_WARRIOR:
+                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "10 stamina/7 defense/15 shield block", EQUIPMENT_SLOT_HEAD, 24149);
+                break;
+        }
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "100 hp", EQUIPMENT_SLOT_HEAD, 15389);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "150 mana", EQUIPMENT_SLOT_HEAD, 15340);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "125 armor", EQUIPMENT_SLOT_HEAD, 15391);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "8 strength", EQUIPMENT_SLOT_HEAD, 15397);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "8 healing", EQUIPMENT_SLOT_HEAD, 22844);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "10 nature resistance", EQUIPMENT_SLOT_HEAD, 28161);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "20 fire resistance", EQUIPMENT_SLOT_HEAD, 15394);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "1% dodge", EQUIPMENT_SLOT_HEAD, 22846);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "1% haste", EQUIPMENT_SLOT_HEAD, 22840);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TALK, "Main Menu", 0, 0);
+        pPlayer->PlayerTalkClass->SendGossipMenu(GOSSIP_TEXT_CRYSTAL_2, pCreature->GetObjectGuid());
+    }
+    else if (uiAction == GOSSIP_ACTION_INFO_DEF + 2)
+    {
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "33 healing", EQUIPMENT_SLOT_SHOULDERS, 24420);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "18 spell damage and healing", EQUIPMENT_SLOT_SHOULDERS, 24421);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "30 attack power", EQUIPMENT_SLOT_SHOULDERS, 24422);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "5 all resistance", EQUIPMENT_SLOT_SHOULDERS, 22599);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TALK, "Main Menu", 0, 0);
+        pPlayer->PlayerTalkClass->SendGossipMenu(GOSSIP_TEXT_CRYSTAL_2, pCreature->GetObjectGuid());
+    }
+    else if (uiAction == GOSSIP_ACTION_INFO_DEF + 3)
+    {
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "15 fire resistance", EQUIPMENT_SLOT_BACK, 25081);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "15 nature resistance", EQUIPMENT_SLOT_BACK, 25082);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "10 shadow resistance", EQUIPMENT_SLOT_BACK, 13522);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "1% dodge", EQUIPMENT_SLOT_BACK, 25086);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "increase stealth", EQUIPMENT_SLOT_BACK, 25083);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "decrease threat 2%", EQUIPMENT_SLOT_BACK, 25084);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "3 agility", EQUIPMENT_SLOT_BACK, 13882);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "70 armor", EQUIPMENT_SLOT_BACK, 20015);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "3 all resistances", EQUIPMENT_SLOT_BACK, 13794);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TALK, "Main Menu", 0, 0);
+        pPlayer->PlayerTalkClass->SendGossipMenu(GOSSIP_TEXT_CRYSTAL_2, pCreature->GetObjectGuid());
+    }
+    else if (uiAction == GOSSIP_ACTION_INFO_DEF + 4)
+    {
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "4 to all stats", EQUIPMENT_SLOT_CHEST, 20025);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "100 hp", EQUIPMENT_SLOT_CHEST, 20073);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "100 mana", EQUIPMENT_SLOT_CHEST, 20028);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "lesser absorption", EQUIPMENT_SLOT_CHEST, 13538);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Main Menu", 0, 0);
+        pPlayer->PlayerTalkClass->SendGossipMenu(GOSSIP_TEXT_CRYSTAL_2, pCreature->GetObjectGuid());
+    }
+    else if (uiAction == GOSSIP_ACTION_INFO_DEF + 5)
+    {
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "9 stamina", EQUIPMENT_SLOT_WRISTS, 20011);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "9 strength", EQUIPMENT_SLOT_WRISTS, 20010);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "7 intellect", EQUIPMENT_SLOT_WRISTS, 20008);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "4 mp5", EQUIPMENT_SLOT_WRISTS, 23801);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "24 healing", EQUIPMENT_SLOT_WRISTS, 25079);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "1 agility", EQUIPMENT_SLOT_WRISTS, 7779);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "3 defense", EQUIPMENT_SLOT_WRISTS, 13931);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "9 spirit", EQUIPMENT_SLOT_WRISTS, 20009);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TALK, "Main Menu", 0, 0);
+        pPlayer->PlayerTalkClass->SendGossipMenu(GOSSIP_TEXT_CRYSTAL_2, pCreature->GetObjectGuid());
+    }
+    else if (uiAction == GOSSIP_ACTION_INFO_DEF + 6)
+    {
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "30 healing", EQUIPMENT_SLOT_HANDS, 25079);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "20 shadow spell damage", EQUIPMENT_SLOT_HANDS, 25073);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "20 frost spell damage", EQUIPMENT_SLOT_HANDS, 25074);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "20 fire spell damage", EQUIPMENT_SLOT_HANDS, 25078);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "15 agility", EQUIPMENT_SLOT_HANDS, 25080);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "2% threat", EQUIPMENT_SLOT_HANDS, 25072);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "1% attack speed", EQUIPMENT_SLOT_HANDS, 13948);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "7 strength", EQUIPMENT_SLOT_HANDS, 20013);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "5 herbalism", EQUIPMENT_SLOT_HANDS, 13868);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "5 mining", EQUIPMENT_SLOT_HANDS, 13841);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "5 skinning", EQUIPMENT_SLOT_HANDS, 13698);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "minor mount speed", EQUIPMENT_SLOT_HANDS, 13947);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TALK, "Main Menu", 0, 0);
+        pPlayer->PlayerTalkClass->SendGossipMenu(GOSSIP_TEXT_CRYSTAL_2, pCreature->GetObjectGuid());
+    }
+    else if (uiAction == GOSSIP_ACTION_INFO_DEF + 7)
+    {
+        switch (pPlayer->getClass())
+        {
+            case CLASS_PALADIN:
+                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "10 stamina/7 defense/24 healing", EQUIPMENT_SLOT_LEGS, 24160);
+                break;
+            case CLASS_MAGE:
+                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "18 spell damage and healing/1% spell hit", EQUIPMENT_SLOT_LEGS, 24164);
+                break;
+            case CLASS_PRIEST:
+                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "10 stamina/4 mp5/24 healing", EQUIPMENT_SLOT_LEGS, 24167);
+                break;
+            case CLASS_WARLOCK:
+                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "10 stamina/18 spell damage and healing", EQUIPMENT_SLOT_LEGS, 24165);
+                break;
+            case CLASS_DRUID:
+                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "10 stamina/10 intellect/24 healing", EQUIPMENT_SLOT_LEGS, 24168);
+                break;
+            case CLASS_HUNTER:
+                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "24 ranged attack power/10 stamina/1% crit", EQUIPMENT_SLOT_LEGS, 24162);
+                break;
+            case CLASS_SHAMAN:
+                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "15 intellect/13 spell damage and healing", EQUIPMENT_SLOT_LEGS, 24163);
+                break;
+            case CLASS_WARRIOR:
+                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "10 stamina/7 defense/15 shield block", EQUIPMENT_SLOT_LEGS, 24149);
+                break;
+        }
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "100 hp", EQUIPMENT_SLOT_LEGS, 15389);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "150 mana", EQUIPMENT_SLOT_LEGS, 15340);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "125 armor", EQUIPMENT_SLOT_LEGS, 15391);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "8 strength", EQUIPMENT_SLOT_LEGS, 15397);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "8 healing", EQUIPMENT_SLOT_LEGS, 22844);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "10 nature resistance", EQUIPMENT_SLOT_LEGS, 28161);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "20 fire resistance", EQUIPMENT_SLOT_LEGS, 15394);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "1% dodge", EQUIPMENT_SLOT_LEGS, 22846);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "1% haste", EQUIPMENT_SLOT_LEGS, 22840);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TALK, "Main Menu", 0, 0);
+        pPlayer->PlayerTalkClass->SendGossipMenu(GOSSIP_TEXT_CRYSTAL_2, pCreature->GetObjectGuid());
+    }
+    else if (uiAction == GOSSIP_ACTION_INFO_DEF + 8)
+    {
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "minor speed", EQUIPMENT_SLOT_FEET, 13890);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "7 agility", EQUIPMENT_SLOT_FEET, 20023);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "7 stamina", EQUIPMENT_SLOT_FEET, 20020);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "5 spirit", EQUIPMENT_SLOT_FEET, 20024);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TALK, "Main Menu", 0, 0);
+        pPlayer->PlayerTalkClass->SendGossipMenu(GOSSIP_TEXT_CRYSTAL_2, pCreature->GetObjectGuid());
+    }
+    //else if (uiAction == GOSSIP_ACTION_INFO_DEF + 9)
+    //{
+    //    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "4 to all stats", EQUIPMENT_SLOT_FINGER1, 27927);
+    //    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "12 spell damage", EQUIPMENT_SLOT_FINGER1, 27924);
+    //    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "20 healing 7 spell damage", EQUIPMENT_SLOT_FINGER1, 27926);
+    //    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "2 damage to physical attacks", EQUIPMENT_SLOT_FINGER1, 27920);
+    //    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TALK, "Main Menu", 0, 0);
+    //    pPlayer->PlayerTalkClass->SendGossipMenu(GOSSIP_TEXT_CRYSTAL_2, pCreature->GetObjectGuid());
+    //}
+    //else if (uiAction == GOSSIP_ACTION_INFO_DEF + 10)
+    //{
+    //    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "4 to all stats", EQUIPMENT_SLOT_FINGER2, 27927);
+    //    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "12 spell damage", EQUIPMENT_SLOT_FINGER2, 27924);
+    //    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "20 healing 7 spell damage", EQUIPMENT_SLOT_FINGER2, 27926);
+    //    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "2 physical damage", EQUIPMENT_SLOT_FINGER2, 27920);
+    //    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TALK, "Main Menu", 0, 0);
+    //    pPlayer->PlayerTalkClass->SendGossipMenu(GOSSIP_TEXT_CRYSTAL_2, pCreature->GetObjectGuid());
+    //}
+    else if (uiAction == GOSSIP_ACTION_INFO_DEF + 11)
+    {
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "25 agility", EQUIPMENT_SLOT_MAINHAND, 27837);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "9 physical damage", EQUIPMENT_SLOT_MAINHAND, 20030);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "9 intellect", EQUIPMENT_SLOT_MAINHAND, 20036);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "9 spirit", EQUIPMENT_SLOT_MAINHAND, 20035);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TALK, "Main Menu", 0, 0);
+        pPlayer->PlayerTalkClass->SendGossipMenu(GOSSIP_TEXT_CRYSTAL_2, pCreature->GetObjectGuid());
+    }
+    else if (uiAction == GOSSIP_ACTION_INFO_DEF + 12)
+    {
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Crusader", EQUIPMENT_SLOT_MAINHAND, 20034);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Fiery Weapon", EQUIPMENT_SLOT_MAINHAND, 13898);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "30 spell damage", EQUIPMENT_SLOT_MAINHAND, 22749);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "55 healing", EQUIPMENT_SLOT_MAINHAND, 22750);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "15 agility", EQUIPMENT_SLOT_MAINHAND, 23800);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Next Page ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 13);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TALK, "Main Menu", 0, 0);
+        pPlayer->PlayerTalkClass->SendGossipMenu(GOSSIP_TEXT_CRYSTAL_2, pCreature->GetObjectGuid());
+    }
+    else if (uiAction == GOSSIP_ACTION_INFO_DEF + 13)
+    {
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "15 strength", EQUIPMENT_SLOT_MAINHAND, 23799);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Icy Chill", EQUIPMENT_SLOT_MAINHAND, 20029);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Lifestealing", EQUIPMENT_SLOT_MAINHAND, 20032);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "20 spirit", EQUIPMENT_SLOT_MAINHAND, 23803);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "22 intellect", EQUIPMENT_SLOT_MAINHAND, 23804);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "<- Previous Page", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 12);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TALK, "Main Menu", 0, 0);
+        pPlayer->PlayerTalkClass->SendGossipMenu(GOSSIP_TEXT_CRYSTAL_2, pCreature->GetObjectGuid());
+    }
+    else if (uiAction == GOSSIP_ACTION_INFO_DEF + 14)
+    {
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Crusader", EQUIPMENT_SLOT_OFFHAND, 20034);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Fiery Weapon", EQUIPMENT_SLOT_OFFHAND, 13898);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "30 spell damage", EQUIPMENT_SLOT_OFFHAND, 22749);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "55 healing", EQUIPMENT_SLOT_OFFHAND, 22750);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "15 agility", EQUIPMENT_SLOT_OFFHAND, 23800);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Next Page ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 15);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TALK, "Main Menu", 0, 0);
+        pPlayer->PlayerTalkClass->SendGossipMenu(GOSSIP_TEXT_CRYSTAL_2, pCreature->GetObjectGuid());
+    }
+    else if (uiAction == GOSSIP_ACTION_INFO_DEF + 15)
+    {
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "15 strength", EQUIPMENT_SLOT_OFFHAND, 23799);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Icy Chill", EQUIPMENT_SLOT_OFFHAND, 20029);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Lifestealing", EQUIPMENT_SLOT_OFFHAND, 20032);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "20 spirit", EQUIPMENT_SLOT_OFFHAND, 23803);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "22 intellect", EQUIPMENT_SLOT_OFFHAND, 23804);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "<- Previous Page", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 14);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TALK, "Main Menu ", 0, 0);
+        pPlayer->PlayerTalkClass->SendGossipMenu(GOSSIP_TEXT_CRYSTAL_2, pCreature->GetObjectGuid());
+    }
+    else if (uiAction == GOSSIP_ACTION_INFO_DEF + 16)
+    {
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "7 damage", EQUIPMENT_SLOT_RANGED, 12460);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "3% hit", EQUIPMENT_SLOT_RANGED, 22779);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TALK, "Main Menu ", 0, 0);
+        pPlayer->PlayerTalkClass->SendGossipMenu(GOSSIP_TEXT_CRYSTAL_2, pCreature->GetObjectGuid());
+    }
+    else if (uiAction == GOSSIP_ACTION_INFO_DEF + 17)
+    {
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Thorium Shield Spike", EQUIPMENT_SLOT_OFFHAND, 16623);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "7 stamina", EQUIPMENT_SLOT_OFFHAND, 20017);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "8 frost resistance", EQUIPMENT_SLOT_OFFHAND, 13933);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TALK, "Main Menu", 0, 0);
+        pPlayer->PlayerTalkClass->SendGossipMenu(GOSSIP_TEXT_CRYSTAL_2, pCreature->GetObjectGuid());
+    }
+    else if (uiAction == GOSSIP_ACTION_INFO_DEF + 0)
+        GossipHello_npc_enchantment_crystal(pPlayer, pCreature);
+    else
+    {
+        pPlayer->EnchantItem(uiAction, uiSender);
+        GossipHello_npc_enchantment_crystal(pPlayer, pCreature);
+    }
+    return true;
+}
+
 void AddSC_npcs_special()
 {
     Script* pNewScript;
@@ -1063,5 +1342,11 @@ void AddSC_npcs_special()
     pNewScript = new Script;
     pNewScript->Name = "npc_aoe_damage_trigger";
     pNewScript->GetAI = &GetNewAIInstance<npc_aoe_damage_triggerAI>;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "npc_enchantment_crystal";
+    pNewScript->pGossipHello = &GossipHello_npc_enchantment_crystal;
+    pNewScript->pGossipSelect = &GossipSelect_npc_enchantment_crystal;
     pNewScript->RegisterSelf();
 }

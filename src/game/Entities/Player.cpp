@@ -15543,6 +15543,44 @@ void Player::SaveToDB()
         pet->SavePetToDB(PET_SAVE_AS_CURRENT, this);
 }
 
+// voa custom
+void Player::EnchantItem(uint32 spellId, uint8 slot)
+{
+    Item* pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
+
+    if (spellId == 0)
+        return;
+
+    if (!pItem)
+        return;
+
+    // Special cases for shields
+    if (pItem->GetProto()->Class == ITEM_CLASS_ARMOR && pItem->GetProto()->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD)
+    {
+        if (spellId != 44383 && spellId != 34009 && spellId != 27945 && spellId != 27947 && spellId != 27946 && spellId != 20016 && spellId != 11224 && spellId != 13464 && spellId != 23530)
+            return;
+    }
+
+    if (pItem->GetEntry() == 33681 || pItem->GetEntry() == 33736 || pItem->GetEntry() == 34033)
+        return;
+
+    SpellEntry const* spellInfo = sSpellTemplate.LookupEntry<SpellEntry>(spellId);
+    if (!spellInfo)
+        return;
+
+    uint32 enchantid = spellInfo->EffectMiscValue[0];
+    if (!enchantid)
+        return;
+
+    if (!((1 << pItem->GetProto()->SubClass) & spellInfo->EquippedItemSubClassMask) &&
+        !((1 << pItem->GetProto()->InventoryType) & spellInfo->EquippedItemInventoryTypeMask))
+        return;
+
+    ApplyEnchantment(pItem, PERM_ENCHANTMENT_SLOT, false);
+    pItem->SetEnchantment(PERM_ENCHANTMENT_SLOT, enchantid, 0, 0);
+    ApplyEnchantment(pItem, PERM_ENCHANTMENT_SLOT, true);
+}
+
 // fast save function for item/money cheating preventing - save only inventory and money state
 void Player::SaveInventoryAndGoldToDB()
 {

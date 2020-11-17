@@ -1226,6 +1226,9 @@ class Player : public Unit
         void LoadCorpse();
         void LoadPet();
 
+        // voa custom
+        void EnchantItem(uint32 spellid, uint8 slot);
+
         uint32 m_stableSlots;
 
         /*********************************************************/
