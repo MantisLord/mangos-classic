@@ -8234,6 +8234,8 @@ void ObjectMgr::LoadTrainers(char const* tableName, bool isTemplates)
         if (SpellMgr::IsProfessionSpell(spellinfo->EffectTriggerSpell[0]))
             data.trainerType = 2;
 
+        mTrainerSpellList.push_back(trainerSpell);
+
         ++count;
     }
     while (result->NextRow());

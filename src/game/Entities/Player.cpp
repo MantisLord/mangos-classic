@@ -18001,6 +18001,200 @@ void Player::learnDefaultSpells()
     }
 }
 
+void Player::learnClassLevelSpells(bool includeHighLevelQuestRewards)
+{
+    ChrClassesEntry const* clsEntry = sChrClassesStore.LookupEntry(getClass());
+    if (!clsEntry)
+        return;
+    uint32 family = clsEntry->spellfamily;
+
+    // special cases which aren't sourced from trainers and normally require quests to obtain - added here for convenience
+    ObjectMgr::QuestMap const& qTemplates = sObjectMgr.GetQuestTemplates();
+    for (const auto& qTemplate : qTemplates)
+    {
+        Quest const* quest = qTemplate.second;
+        if (!quest)
+            continue;
+
+        // only class quests player could do
+        if (quest->GetRequiredClasses() == 0 || !SatisfyQuestClass(quest, false) || !SatisfyQuestRace(quest, false) || !SatisfyQuestLevel(quest, false))
+            continue;
+
+        // custom filter for scripting purposes
+        if (!includeHighLevelQuestRewards && quest->GetMinLevel() >= 60)
+            continue;
+
+        learnQuestRewardedOrSrcSpells(quest);
+
+        if (quest->GetSrcSpell())
+            learnQuestRewardedOrSrcSpells(quest, true);
+    }
+
+    std::list<TrainerSpell> const& trainerSpells = sObjectMgr.GetTrainerSpells();
+    for (const auto& tSpell : trainerSpells)
+    {
+        SpellEntry const* spellInfo = sSpellTemplate.LookupEntry<SpellEntry>(tSpell.spell);
+        if (!spellInfo)
+            continue;
+
+        uint32 reqLevel = 0;
+        if (!IsSpellFitByClassAndRace(tSpell.spell, &reqLevel))
+            continue;
+
+        reqLevel = tSpell.isProvidedReqLevel ? tSpell.reqLevel : std::max(reqLevel, tSpell.reqLevel);
+
+        TrainerSpellState state = GetTrainerSpellState(&tSpell, reqLevel);
+        if (state == TRAINER_SPELL_RED)
+            continue;
+
+        if (tSpell.conditionId && !sObjectMgr.IsConditionSatisfied(tSpell.conditionId, this, GetMap(), this, CONDITION_FROM_TRAINER))
+            continue;
+
+        // special case for Judgement/Seal of Righteousness
+        if (spellInfo->Id == 10321 && getClass() == CLASS_PALADIN)
+        {
+            CastSpell(this, spellInfo->Id, TRIGGERED_OLD_TRIGGERED);
+            continue;
+        }
+
+        // skip other spell families (minus a few exceptions)
+        if (spellInfo->SpellFamilyName != family)
+        {
+            SkillLineAbilityMapBounds bounds = sSpellMgr.GetSkillLineAbilityMapBoundsBySpellId(tSpell.learnedSpell);
+            if (bounds.first == bounds.second)
+                continue;
+
+            SkillLineAbilityEntry const* skillInfo = bounds.first->second;
+            if (!skillInfo)
+                continue;
+
+            switch (skillInfo->skillId)
+            {
+                case SKILL_SUBTLETY:
+                case SKILL_POISONS:
+                case SKILL_BEAST_MASTERY:
+                case SKILL_SURVIVAL:
+                case SKILL_DEFENSE:
+                case SKILL_DUAL_WIELD:
+                case SKILL_FERAL_COMBAT:
+                case SKILL_PROTECTION:
+                case SKILL_BEAST_TRAINING:
+                case SKILL_PLATE_MAIL:
+                case SKILL_DEMONOLOGY:
+                case SKILL_ENHANCEMENT:
+                case SKILL_MAIL:
+                case SKILL_HOLY2:
+                case SKILL_LOCKPICKING:
+                case SKILL_SWORDS:
+                case SKILL_AXES:
+                case SKILL_BOWS:
+                case SKILL_GUNS:
+                case SKILL_MACES:
+                case SKILL_2H_SWORDS:
+                case SKILL_STAVES:
+                case SKILL_2H_MACES:
+                case SKILL_2H_AXES:
+                case SKILL_DAGGERS:
+                case SKILL_THROWN:
+                case SKILL_CROSSBOWS:
+                case SKILL_POLEARMS:
+                case SKILL_WANDS:
+                case SKILL_FIST_WEAPONS:
+                    break;
+                default:
+                    continue;
+            }
+        }
+
+        // skip spells with first rank learned as talent (and all talents then also)
+        uint32 first_rank = sSpellMgr.GetFirstSpellInChain(tSpell.spell);
+        if (GetTalentSpellCost(first_rank) > 0)
+            continue;
+
+        // skip broken spells
+        if (!SpellMgr::IsSpellValid(spellInfo, this, false))
+            continue;
+
+        learnSpell(tSpell.spell, false);
+    }
+}
+
+void Player::learnQuestRewardedOrSrcSpells(Quest const* quest, bool srcSpell)
+{
+    uint32 spell_id = 0;
+
+    if (srcSpell)
+        spell_id = quest->GetSrcSpell();
+    else
+        spell_id = quest->GetRewSpellCast();
+
+    // skip quests without rewarded or source spell
+    if (!spell_id)
+        return;
+
+    SpellEntry const* spellInfo = sSpellTemplate.LookupEntry<SpellEntry>(spell_id);
+    if (!spellInfo)
+        return;
+
+    // check learned spells state
+    bool found = false;
+    for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
+    {
+        if (spellInfo->Effect[i] == SPELL_EFFECT_LEARN_SPELL && !HasSpell(spellInfo->EffectTriggerSpell[i]))
+        {
+            found = true;
+            break;
+        }
+    }
+
+    // skip quests with not teaching spell or already known spell
+    if (!found)
+        return;
+
+    // prevent learn non first rank unknown profession and second specialization for same profession)
+    uint32 learned_0 = spellInfo->EffectTriggerSpell[EFFECT_INDEX_0];
+    if (sSpellMgr.GetSpellRank(learned_0) > 1 && !HasSpell(learned_0))
+    {
+        // not have first rank learned (unlearned prof?)
+        uint32 first_spell = sSpellMgr.GetFirstSpellInChain(learned_0);
+        if (!HasSpell(first_spell))
+            return;
+
+        SpellEntry const* learnedInfo = sSpellTemplate.LookupEntry<SpellEntry>(learned_0);
+        if (!learnedInfo)
+            return;
+
+        // specialization
+        if (learnedInfo->Effect[EFFECT_INDEX_0] == SPELL_EFFECT_TRADE_SKILL && learnedInfo->Effect[EFFECT_INDEX_1] == 0)
+        {
+            // search other specialization for same prof
+            for (PlayerSpellMap::const_iterator itr = m_spells.begin(); itr != m_spells.end(); ++itr)
+            {
+                if (itr->second.state == PLAYERSPELL_REMOVED || itr->first == learned_0)
+                    continue;
+
+                SpellEntry const* itrInfo = sSpellTemplate.LookupEntry<SpellEntry>(itr->first);
+                if (!itrInfo)
+                    return;
+
+                // compare only specializations
+                if (itrInfo->Effect[EFFECT_INDEX_0] != SPELL_EFFECT_TRADE_SKILL || itrInfo->Effect[EFFECT_INDEX_1] != 0)
+                    continue;
+
+                // compare same chain spells
+                if (sSpellMgr.GetFirstSpellInChain(itr->first) != first_spell)
+                    continue;
+
+                // now we have 2 specialization, learn possible only if found is lesser specialization rank
+                if (!sSpellMgr.IsSpellHigherRankOfSpell(learned_0, itr->first))
+                    return;
+            }
+        }
+    }
+
+    CastSpell(this, spell_id, TRIGGERED_OLD_TRIGGERED | TRIGGERED_INSTANT_CAST);
+}
+
 void Player::learnQuestRewardedSpells(Quest const* quest)
 {
     uint32 spell_id = quest->GetRewSpellCast();

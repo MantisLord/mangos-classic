@@ -1029,8 +1029,6 @@ bool GossipHello_npc_enchantment_crystal(Player* pPlayer, Creature* pCreature)
     pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Hands", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
     pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Legs", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 7);
     pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Feet", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 8);
-    //pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Ring", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9);
-    //pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Ring2", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 10);
     pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "2H Weapon", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
     pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Mainhand Weapon", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 12);
     pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Offhand", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 14);
@@ -1196,24 +1194,6 @@ bool GossipSelect_npc_enchantment_crystal(Player* pPlayer, Creature* pCreature, 
         pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TALK, "Main Menu", 0, 0);
         pPlayer->PlayerTalkClass->SendGossipMenu(GOSSIP_TEXT_CRYSTAL_2, pCreature->GetObjectGuid());
     }
-    //else if (uiAction == GOSSIP_ACTION_INFO_DEF + 9)
-    //{
-    //    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "4 to all stats", EQUIPMENT_SLOT_FINGER1, 27927);
-    //    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "12 spell damage", EQUIPMENT_SLOT_FINGER1, 27924);
-    //    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "20 healing 7 spell damage", EQUIPMENT_SLOT_FINGER1, 27926);
-    //    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "2 damage to physical attacks", EQUIPMENT_SLOT_FINGER1, 27920);
-    //    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TALK, "Main Menu", 0, 0);
-    //    pPlayer->PlayerTalkClass->SendGossipMenu(GOSSIP_TEXT_CRYSTAL_2, pCreature->GetObjectGuid());
-    //}
-    //else if (uiAction == GOSSIP_ACTION_INFO_DEF + 10)
-    //{
-    //    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "4 to all stats", EQUIPMENT_SLOT_FINGER2, 27927);
-    //    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "12 spell damage", EQUIPMENT_SLOT_FINGER2, 27924);
-    //    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "20 healing 7 spell damage", EQUIPMENT_SLOT_FINGER2, 27926);
-    //    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "2 physical damage", EQUIPMENT_SLOT_FINGER2, 27920);
-    //    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TALK, "Main Menu", 0, 0);
-    //    pPlayer->PlayerTalkClass->SendGossipMenu(GOSSIP_TEXT_CRYSTAL_2, pCreature->GetObjectGuid());
-    //}
     else if (uiAction == GOSSIP_ACTION_INFO_DEF + 11)
     {
         pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "25 agility", EQUIPMENT_SLOT_MAINHAND, 27837);
@@ -1292,6 +1272,912 @@ bool GossipSelect_npc_enchantment_crystal(Player* pPlayer, Creature* pCreature, 
     return true;
 }
 
+
+enum
+{
+    SPELL_JOURNEYMAN_RIDING = 33392,
+    SPELL_ARTISAN_FIRST_AID = 10847,
+    SPELL_HEAVY_RUNECLOTH_BAND = 18632,
+
+    GOSSIP_MENU_OVERLORD_MAIN = 50414,
+};
+
+const std::vector<uint32> Level1StartingGear = { 25,35,36,37,39,40,43,44,47,48,51,52,55,56,57,59,117,120,121,129,139,140,147,153,159,1395,1396,2070,2092,2101,2102,2361,2362,2504,2508,2512,2516,3661,4536,4540,4604,6098,6116,6118,6119,6121,6122,6123,6124,6126,6127,6129,6135,6137,6138,6139,6140,6144,12282,20857,20891,20892,20893,20894,20895,20896,20898,20899,20900,20980,20981,20982,20983,23322,23344,23346,23347,23348,23474,23475,23477,23478,23479,24145,24146,25861,28979 };
+
+struct CustomTeleportLocation
+{
+    uint32 map;
+    float x, y, z, o;
+    uint32 area;
+};
+static const CustomTeleportLocation teleLocs[] =
+{
+    {0, -11792.108398f, -3226.608154f, -29.721224f, 2.613495f, 0},  // Dark Portal - Alliance
+    {0, -11774.694336f, -3184.537598f, -28.923182f, 2.749808f, 0},  // Dark Portal - Horde
+
+    {0, -8931.93f, -132.83f, 82.88f, 3.26f, 0},                     // Northshire (Human)
+    {0, -6213.47f, 330.64f, 383.68f, 3.15f, 0},                     // Coldridge Valley (Dwarf and Gnome)
+    {1, 10317.40f, 821.00f, 1326.37f, 2.15f, 0},                    // Shadowglen (Night Elf)
+
+    {1, -607.47f, -4248.13f, 38.95f, 3.27f, 0},                     // Valley of Trials (Orc and Troll)
+    {0, 1656.367f, 1682.592f, 120.78681f, 0.06632f, 0},             // Deathknell (Undead)
+    {1, -2913.71f, -254.67f, 52.94f, 3.70f, 0},                     // Camp Narache (Tauren)
+};
+
+struct npc_test_realm_overlord : public ScriptedAI
+{
+    npc_test_realm_overlord(Creature* creature) : ScriptedAI(creature) { Reset(); }
+
+    void Reset() override
+    {
+    }
+
+    void UpdateAI(const uint32 diff) override
+    {
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
+            return;
+
+        DoMeleeAttackIfReady();
+    }
+
+    uint32 GetStarterMountForRace(Player* player)
+    {
+        uint32 mountEntry = 0;
+        switch (player->getRace())
+        {
+        case RACE_HUMAN: mountEntry = 2411; break;      // Black Stallion Bridle
+        case RACE_DWARF: mountEntry = 5872; break;      // Brown Ram
+        case RACE_NIGHTELF: mountEntry = 8632; break;   // Reins of the Spotted Frostsaber
+        case RACE_GNOME: mountEntry = 8595; break;      // Blue Mechanostrider
+        case RACE_ORC: mountEntry = 5665; break;        // Horn of the Dire Wolf
+        case RACE_UNDEAD: mountEntry = 13331; break;    // Red Skeletal Horse
+        case RACE_TAUREN: mountEntry = 15277; break;    // Gray Kodo
+        case RACE_TROLL: mountEntry = 8588; break;      // Whistle of the Emerald Raptor
+        }
+        return mountEntry;
+    }
+
+    uint32 GetStarterEpicMountForRace(Player* player)
+    {
+        uint32 mountEntry = 0;
+        switch (player->getRace())
+        {
+        case RACE_HUMAN: mountEntry = 18776; break;     // Swift Palomino
+        case RACE_DWARF: mountEntry = 18787; break;     // Swift Gray Ram
+        case RACE_NIGHTELF: mountEntry = 18767; break;  // Reins of the Swift Mistsaber
+        case RACE_GNOME: mountEntry = 18772; break;     // Swift Green Mechanostrider
+        case RACE_ORC: mountEntry = 18797; break;       // Horn of the Swift Timber Wolf 
+        case RACE_UNDEAD: mountEntry = 18791; break;    // Purple Skeletal Warhorse
+        case RACE_TAUREN: mountEntry = 18795; break;    // Great Gray Kodo
+        case RACE_TROLL: mountEntry = 18790; break;     // Swift Orange Raptor
+        }
+        return mountEntry;
+    }
+
+    void BoostPlayer(Player* player, uint32 targetLevel)
+    {
+        if (player->getLevel() < targetLevel)
+        {
+            player->GiveLevel(targetLevel);
+            player->SetUInt32Value(PLAYER_XP, 0);
+            player->learnClassLevelSpells(true);
+            player->UpdateSkillsForLevel(true);
+
+            if (player->getClass() == CLASS_HUNTER)
+            {
+                if (Pet* pet = player->GetPet())
+                {
+                    if (pet->getLevel() < targetLevel)
+                    {
+                        pet->GivePetLevel(targetLevel);
+                        pet->SavePetToDB(PET_SAVE_AS_CURRENT, player);
+                    }
+                }
+            }
+        }
+
+        // Learn skills
+        player->CastSpell(player, SPELL_JOURNEYMAN_RIDING, TRIGGERED_OLD_TRIGGERED);
+        player->CastSpell(player, SPELL_ARTISAN_FIRST_AID, TRIGGERED_OLD_TRIGGERED);
+        player->CastSpell(player, SPELL_HEAVY_RUNECLOTH_BAND, TRIGGERED_OLD_TRIGGERED);
+
+        SkillLineEntry const* sl = sSkillLineStore.LookupEntry(SKILL_FIRST_AID);
+        if (sl)
+        {
+            uint32 maxSkill = player->GetSkillMaxPure(SKILL_FIRST_AID);
+
+            if (player->GetSkillValue(SKILL_FIRST_AID) < maxSkill)
+                player->SetSkill(SKILL_FIRST_AID, maxSkill, maxSkill);
+        }
+
+        // Remove any gear the character still has from initial creation (now useless)
+        for (uint32 itemEntry : Level1StartingGear)
+            player->DestroyItemCount(itemEntry, 200, true, false);
+
+        // Onyxia Hide Backpack x4
+        if (!player->HasItemCount(17966, 4)) player->StoreNewItemInBestSlots(17966, 4);
+
+        // Epic Ground Mount
+        uint32 groundMount = GetStarterEpicMountForRace(player);
+        if (!player->HasItemCount(groundMount, 1)) player->StoreNewItemInBestSlots(groundMount, 1);
+
+        player->SaveToDB();
+    }
+};
+
+bool GossipHello_npc_test_realm_overlord(Player* player, Creature* creature)
+{
+    player->PrepareGossipMenu(creature, GOSSIP_MENU_OVERLORD_MAIN);
+    if (player->getLevel() < 60)
+        player->ADD_GOSSIP_ITEM_EXTENDED(GOSSIP_ICON_INTERACT_1, "|cFF00008BBoost to level 60|r", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3, "Are you sure?", 0, false);
+    else {
+        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TAXI, "Teleport to Blasted Lands (Dark Portal)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
+    }
+
+    player->SendPreparedGossip(creature);
+    return true;
+}
+
+bool GossipSelect_npc_test_realm_overlord(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
+{
+    if (npc_test_realm_overlord* testRealmOverlordAI = dynamic_cast<npc_test_realm_overlord*>(creature->AI()))
+    {
+        switch (action)
+        {
+        case GOSSIP_ACTION_INFO_DEF + 3:
+        {
+            player->CLOSE_GOSSIP_MENU();
+            testRealmOverlordAI->BoostPlayer(player, 60);
+            // Teleport Player to Dark Portal
+            if (player->GetTeam() == ALLIANCE)
+                player->TeleportTo(teleLocs[0].map, teleLocs[0].x, teleLocs[0].y, teleLocs[0].z, teleLocs[0].o);
+            else
+                player->TeleportTo(teleLocs[1].map, teleLocs[1].x, teleLocs[1].y, teleLocs[1].z, teleLocs[1].o);
+            break;
+        }
+        // Teleport Only - Dark Portal
+        case GOSSIP_ACTION_INFO_DEF + 6:
+        {
+            player->CLOSE_GOSSIP_MENU();
+            // Teleport Player to Dark Portal
+            if (player->GetTeam() == ALLIANCE)
+                player->TeleportTo(teleLocs[0].map, teleLocs[0].x, teleLocs[0].y, teleLocs[0].z, teleLocs[0].o);
+            else
+                player->TeleportTo(teleLocs[1].map, teleLocs[1].x, teleLocs[1].y, teleLocs[1].z, teleLocs[1].o);
+            break;
+        }
+        }
+    }
+
+    return false;
+}
+
+enum
+{
+    SPELL_CYCLONE_VISUAL_SPAWN  = 8609,
+
+    GOSSIP_TEXT_PET_MENU        = 50406,
+    GOSSIP_TEXT_GREET           = 50407,
+    GOSSIP_TEXT_REFUSE_LOW      = 50408,
+    GOSSIP_TEXT_PICK_SPEC       = 50409,
+
+    NPC_PET_BAT     = 8600, // Plaguebat
+    NPC_PET_BEAR    = 7443, // Shardtooth Mauler
+    NPC_PET_BOAR    = 5992, // Ashmane Boar
+    NPC_PET_CARRION = 1809, // Carrion Vulture
+    NPC_PET_CAT     = 1713, // Elder Shadowmaw Panther
+    NPC_PET_CRAB    = 1088, // Monstrous Crawler
+    NPC_PET_CROC    = 1087, // Sawtooth Snapper
+    NPC_PET_GORILLA = 6516, // Un'Goro Thunderer
+    NPC_PET_HYENA   = 5986, // Rabid Snickerfang
+    NPC_PET_OWL     = 7455, // Winterspring Owl
+    NPC_PET_RAPTOR  = 687,  // Jungle Stalker
+    NPC_PET_STRIDER = 4725, // Crazed Sandstrider
+    NPC_PET_SCORPID = 9695, // Deathlash Scorpid
+    NPC_PET_SPIDER  = 8933, // Cave Creeper
+    NPC_PET_SERPENT = 5308, // Rogue Vale Screecher
+    NPC_PET_TURTLE  = 6369, // Coralshell Tortoise
+    NPC_PET_WOLF    = 9697  // Giant Ember Worg
+};
+
+// "Best In Slot"
+const std::vector<uint32> Lvl60BiS_ShamanResto = { 22466, 21712, 22467, 21583, 22464, 22471, 22465, 22469, 22470, 22468, 23065, 21620, 23047, 19395, 23056, 22819, 22396 };
+const std::vector<uint32> Lvl60BiS_ShamanEnhancement = { 18817, 18404, 21684, 23045, 21374, 21602, 21624, 21586, 21651, 21705, 17063, 23038, 22321, 19289, 22798, 22395 };
+const std::vector<uint32> Lvl60BiS_ShamanElemental = { 19375, 22943, 21376, 23050, 21671, 21464, 21585, 22730, 21375, 21373, 21707, 21709, 19379, 23046, 22988, 23049, 23199 };
+const std::vector<uint32> Lvl60BiS_PriestShadow = { 23035, 18814, 22983, 22731, 23220, 21611, 19133, 21585, 19400, 19131, 21709, 19434, 19379, 23046, 22988, 23049, 22820 };
+const std::vector<uint32> Lvl60BiS_PriestDiscHoly = { 21615, 21712, 22515, 22960, 22512, 21604, 22513, 22517, 21582, 22516, 23061, 22939, 23027, 23047, 23056, 23048, 23009 };
+const std::vector<uint32> Lvl60BiS_PaladinHoly = { 19375, 23057, 22429, 23050, 22425, 21604, 22427, 20264, 21582, 22430, 23066, 19382, 19395, 23047, 23056, 23075, 23006 };
+const std::vector<uint32> Lvl60BiS_PaladinRetribution = { 21387, 18404, 21391, 23045, 21389, 22936, 21623, 23219, 21390, 21388, 23038, 17063, 22321, 19289, 22691, 23203, 17182 };
+const std::vector<uint32> Lvl60BiS_PaladinProtection = { 21387, 22732, 21639, 22938, 21389, 20616, 21674, 21598, 19855, 21706, 19376, 21601, 19431, 18406, 22988, 23043, 22401, 19019 };
+const std::vector<uint32> Lvl60BiS_WarriorFuryArms = { 12640, 23053, 21330, 23045, 23000, 22936, 21581, 23219, 23068, 19387, 18821, 23038, 22954, 23041, 23054, 23577, 17076, 22812 };
+const std::vector<uint32> Lvl60BiS_WarriorProtection = { 22418, 22732, 22419, 22938, 22416, 22423, 22421, 22422, 22417, 22420, 23059, 21601, 19431, 19406, 19019, 23043, 19368 };
+const std::vector<uint32> Lvl60BiS_DruidFeralCat = { 8345, 19377, 21665, 21710, 23226, 21602, 21672, 21586, 23071, 21493, 23038, 19432, 19406, 23041, 22988, 22632, 22397, 13385 };
+const std::vector<uint32> Lvl60BiS_DruidFeralBear = { 21693, 22732, 19389, 22938, 23226, 21602, 21605, 21675, 20627, 19381, 21601, 23018, 13966, 11811, 943, 23198 };
+const std::vector<uint32> Lvl60BiS_DruidBalance = { 19375, 23057, 22983, 23050, 19682, 23021, 21585, 22730, 19683, 19684, 23025, 21709, 19379, 23046, 22988, 23049, 23197 };
+const std::vector<uint32> Lvl60BiS_DruidResto = { 20628, 21712, 22491, 22960, 22488, 21604, 22493, 21582, 22489, 22492, 22939, 21620, 23047, 23027, 23056, 22632, 22399, 23048 };
+const std::vector<uint32> Lvl60BiS_Rogue = { 22478, 19377, 22479, 23045, 22476, 22483, 22477, 22481, 22482, 22480, 23060, 23038, 23041, 22954, 23054, 22802, 21126, 23577, 22812, 19019 };
+const std::vector<uint32> Lvl60BiS_Mage = { 22498, 23057, 22983, 23050, 22496, 23021, 23070, 21585, 22730, 22500, 23062, 23237, 19379, 23046, 19339, 22807, 23049, 22821 };
+const std::vector<uint32> Lvl60BiS_Hunter = { 22438, 23053, 22439, 23045, 22436, 22443, 22437, 22441, 22442, 22440, 23067, 22961, 23041, 19406, 22816, 22802, 22812 };
+const std::vector<uint32> Lvl60BiS_Warlock = { 22506, 23057, 22507, 23050, 22504, 21186, 23070, 21585, 22730, 22508, 21709, 23025, 19379, 23046, 22807, 23049, 22820 };
+
+const std::vector<uint32> TaxiNodesAlliance =
+{
+    // Eastern Kingdoms:
+    2,     // Stormwind, Elwynn
+    4,     // Sentinel Hill, Westfall
+    5,     // Lakeshire, Redridge
+    6,     // Ironforge, Dun Morogh
+    7,     // Menethil Harbor, Wetlands
+    8,     // Thelsamar, Loch Modan
+    12,    // Darkshire, Duskwood
+    14,    // Southshore, Hillsbrad
+    16,    // Refuge Pointe, Arathi
+    19,    // Booty Bay, Stranglethorn
+    43,    // Aerie Peak, The Hinterlands
+    45,    // Nethergarde Keep, Blasted Lands
+    66,    // Chillwind Camp, Western Plaguelands
+    67,    // Light's Hope Chapel, Eastern Plaguelands
+    71,    // Morgan's Vigil, Burning Steppes
+    74,    // Thorium Point, Searing Gorge
+    // Kalimdor:
+    26,    // Auberdine, Darkshore
+    27,    // Rut'theran Village, Teldrassil
+    28,    // Astranaar, Ashenvale
+    31,    // Thalanaar, Feralas
+    32,    // Theramore, Dustwallow Marsh
+    33,    // Stonetalon Peak, Stonetalon Mountains
+    37,    // Nijel's Point, Desolace
+    39,    // Gadgetzan, Tanaris
+    41,    // Feathermoon, Feralas
+    49,    // Moonglade
+    52,    // Everlook, Winterspring
+    64,    // Talrendis Point, Azshara
+    65,    // Talonbranch Glade, Felwood
+    73,    // Cenarion Hold, Silithus
+    79,    // Marshal's Refuge, Un'Goro Crater
+    80     // Ratchet, The Barrens
+};
+const std::vector<uint32> TaxiNodesHorde =
+{
+    // Eastern kingdoms:
+    10,    // The Sepulcher, Silverpine Forest
+    11,    // Undercity, Tirisfal
+    13,    // Tarren Mill, Hillsbrad
+    17,    // Hammerfall, Arathi
+    18,    // Booty Bay, Stranglethorn
+    20,    // Grom'gol, Stranglethorn
+    21,    // Kargath, Badlands
+    56,    // Stonard, Swamp of Sorrows
+    68,    // Light's Hope Chapel, Eastern Plaguelands
+    70,    // Flame Crest, Burning Steppes
+    75,    // Thorium Point, Searing Gorge
+    76,    // Revantusk Village, The Hinterlands
+    // Kalimdor:
+    22,    // Thunder Bluff, Mulgore
+    23,    // Orgrimmar, Durotar
+    25,    // Crossroads, The Barrens
+    29,    // Sun Rock Retreat, Stonetalon Mountains
+    30,    // Freewind Post, Thousand Needles
+    38,    // Shadowprey Village, Desolace
+    40,    // Gadgetzan, Tanaris
+    42,    // Camp Mojache, Feralas
+    44,    // Valormok, Azshara
+    48,    // Bloodvenom Post, Felwood
+    53,    // Everlook, Winterspring
+    55,    // Brackenwall Village, Dustwallow Marsh
+    58,    // Zoram'gar Outpost, Ashenvale
+    61,    // Splintertree Post, Ashenvale
+    69,    // Moonglade
+    72,    // Cenarion Hold, Silithus
+    77,    // Camp Taurajo, The Barrens
+    79,    // Marshal's Refuge, Un'Goro Crater
+    80     // Ratchet, The Barrens
+};
+
+struct npc_enlistment_officerAI : public ScriptedAI
+{
+    npc_enlistment_officerAI(Creature* creature) : ScriptedAI(creature)
+    {
+        Reset();
+        FullGearListBiS60.clear();
+        FullGearListBiS60.insert(std::end(FullGearListBiS60), std::begin(Lvl60BiS_ShamanResto), std::end(Lvl60BiS_ShamanResto));
+        FullGearListBiS60.insert(std::end(FullGearListBiS60), std::begin(Lvl60BiS_ShamanEnhancement), std::end(Lvl60BiS_ShamanEnhancement));
+        FullGearListBiS60.insert(std::end(FullGearListBiS60), std::begin(Lvl60BiS_ShamanElemental), std::end(Lvl60BiS_ShamanElemental));
+        FullGearListBiS60.insert(std::end(FullGearListBiS60), std::begin(Lvl60BiS_PriestShadow), std::end(Lvl60BiS_PriestShadow));
+        FullGearListBiS60.insert(std::end(FullGearListBiS60), std::begin(Lvl60BiS_PriestDiscHoly), std::end(Lvl60BiS_PriestDiscHoly));
+        FullGearListBiS60.insert(std::end(FullGearListBiS60), std::begin(Lvl60BiS_PaladinHoly), std::end(Lvl60BiS_PaladinHoly));
+        FullGearListBiS60.insert(std::end(FullGearListBiS60), std::begin(Lvl60BiS_PaladinRetribution), std::end(Lvl60BiS_PaladinRetribution));
+        FullGearListBiS60.insert(std::end(FullGearListBiS60), std::begin(Lvl60BiS_PaladinProtection), std::end(Lvl60BiS_PaladinProtection));
+        FullGearListBiS60.insert(std::end(FullGearListBiS60), std::begin(Lvl60BiS_WarriorFuryArms), std::end(Lvl60BiS_WarriorFuryArms));
+        FullGearListBiS60.insert(std::end(FullGearListBiS60), std::begin(Lvl60BiS_WarriorProtection), std::end(Lvl60BiS_WarriorProtection));
+        FullGearListBiS60.insert(std::end(FullGearListBiS60), std::begin(Lvl60BiS_DruidFeralCat), std::end(Lvl60BiS_DruidFeralCat));
+        FullGearListBiS60.insert(std::end(FullGearListBiS60), std::begin(Lvl60BiS_DruidFeralBear), std::end(Lvl60BiS_DruidFeralBear));
+        FullGearListBiS60.insert(std::end(FullGearListBiS60), std::begin(Lvl60BiS_DruidBalance), std::end(Lvl60BiS_DruidBalance));
+        FullGearListBiS60.insert(std::end(FullGearListBiS60), std::begin(Lvl60BiS_DruidResto), std::end(Lvl60BiS_DruidResto));
+        FullGearListBiS60.insert(std::end(FullGearListBiS60), std::begin(Lvl60BiS_Rogue), std::end(Lvl60BiS_Rogue));
+        FullGearListBiS60.insert(std::end(FullGearListBiS60), std::begin(Lvl60BiS_Mage), std::end(Lvl60BiS_Mage));
+        FullGearListBiS60.insert(std::end(FullGearListBiS60), std::begin(Lvl60BiS_Hunter), std::end(Lvl60BiS_Hunter));
+        FullGearListBiS60.insert(std::end(FullGearListBiS60), std::begin(Lvl60BiS_Warlock), std::end(Lvl60BiS_Warlock));
+    }
+    std::vector<uint32> FullGearListBiS60;
+
+    void Reset() override {}
+
+    uint32 GetStarterMountForRace(Player* player)
+    {
+        uint32 mountEntry = 0;
+        switch (player->getRace())
+        {
+        case RACE_HUMAN: mountEntry = 2411; break;      // Black Stallion Bridle
+        case RACE_DWARF: mountEntry = 5872; break;      // Brown Ram
+        case RACE_NIGHTELF: mountEntry = 8632; break;   // Reins of the Spotted Frostsaber
+        case RACE_GNOME: mountEntry = 8595; break;      // Blue Mechanostrider
+        case RACE_ORC: mountEntry = 5665; break;        // Horn of the Dire Wolf
+        case RACE_UNDEAD: mountEntry = 13331; break;    // Red Skeletal Horse
+        case RACE_TAUREN: mountEntry = 15277; break;    // Gray Kodo
+        case RACE_TROLL: mountEntry = 8588; break;      // Whistle of the Emerald Raptor
+        }
+        return mountEntry;
+    }
+
+    uint32 GetStarterEpicMountForRace(Player* player)
+    {
+        uint32 mountEntry = 0;
+        switch (player->getRace())
+        {
+        case RACE_HUMAN: mountEntry = 18776; break;     // Swift Palomino
+        case RACE_DWARF: mountEntry = 18787; break;     // Swift Gray Ram
+        case RACE_NIGHTELF: mountEntry = 18767; break;  // Reins of the Swift Mistsaber
+        case RACE_GNOME: mountEntry = 18772; break;     // Swift Green Mechanostrider
+        case RACE_ORC: mountEntry = 18797; break;       // Horn of the Swift Timber Wolf 
+        case RACE_UNDEAD: mountEntry = 18791; break;    // Purple Skeletal Warhorse
+        case RACE_TAUREN: mountEntry = 18795; break;    // Great Gray Kodo
+        case RACE_TROLL: mountEntry = 18790; break;     // Swift Orange Raptor
+        }
+        return mountEntry;
+    }
+
+    void CreatePet(Player* player, Creature* creature, uint32 entry)
+    {
+        if (Creature* creatureTarget = m_creature->SummonCreature(entry, player->GetPositionX(), player->GetPositionY() + 2, player->GetPositionZ(), player->GetOrientation(), TEMPSPAWN_CORPSE_TIMED_DESPAWN, 500))
+        {
+            creatureTarget->SetLevel(player->getLevel() - 1);
+
+            Pet* pet = new Pet(HUNTER_PET);
+
+            if (!pet->CreateBaseAtCreature(creatureTarget))
+            {
+                delete pet;
+                return;
+            }
+
+            pet->SetUInt32Value(UNIT_CREATED_BY_SPELL, 13481); // tame beast
+
+            pet->SetOwnerGuid(player->GetObjectGuid());
+            pet->setFaction(player->getFaction());
+
+            if (player->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED))
+            {
+                pet->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+                //pet->SetByteValue(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_PLAYER_CONTROLLED_DEBUFF_LIMIT);
+            }
+            else
+                //pet->SetByteValue(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_CREATURE_DEBUFF_LIMIT);
+
+            if (player->IsImmuneToNPC())
+                pet->SetImmuneToNPC(true);
+
+            if (player->IsImmuneToPlayer())
+                pet->SetImmuneToPlayer(true);
+
+            if (player->IsPvP())
+                pet->SetPvP(true);
+
+            pet->GetCharmInfo()->SetPetNumber(sObjectMgr.GeneratePetNumber(), true);
+
+            uint32 level = creatureTarget->getLevel();
+            pet->SetCanModifyStats(true);
+            pet->InitStatsForLevel(level);
+
+            pet->SetHealthPercent(creatureTarget->GetHealthPercent());
+
+            // destroy creature object
+            creatureTarget->ForcedDespawn();
+
+            // prepare visual effect for levelup
+            pet->SetUInt32Value(UNIT_FIELD_LEVEL, level - 1);
+
+            // add pet object to the world
+            pet->GetMap()->Add((Creature*)pet);
+            pet->AIM_Initialize();
+
+            pet->AI()->SetReactState(REACT_DEFENSIVE);
+
+            // visual effect for levelup
+            pet->SetUInt32Value(UNIT_FIELD_LEVEL, level);
+
+            // enable rename and abandon prompt
+            //pet->SetByteFlag(UNIT_FIELD_BYTES_2, 2, UNIT_CAN_BE_RENAMED);
+            //pet->SetByteFlag(UNIT_FIELD_BYTES_2, 2, UNIT_CAN_BE_ABANDONED);
+
+            // this enables pet details window (Shift+P)
+            pet->InitPetCreateSpells();
+
+            pet->LearnPetPassives();
+            pet->CastPetAuras(true);
+            pet->CastOwnerTalentAuras();
+            pet->UpdateAllStats();
+
+            // start with maximum loyalty and training points
+            pet->SetLoyaltyLevel(BEST_FRIEND);
+            pet->ModifyLoyalty(26500);
+            pet->SetTP(level * (BEST_FRIEND - 1));
+            pet->SetPower(POWER_HAPPINESS, HAPPINESS_LEVEL_SIZE * 2); // Content
+
+            pet->SetRequiredXpForNextLoyaltyLevel();
+
+            // caster have pet now
+            player->SetPet(pet);
+
+            player->PetSpellInitialize();
+
+            pet->SavePetToDB(PET_SAVE_AS_CURRENT, player);
+        }
+
+        player->PlayerTalkClass->CloseGossip();
+        creature->MonsterWhisper("An excellent choice! May it serve you well on the battlefield.", player);
+    }
+
+    bool HasStarterSet(Player* player, std::vector<uint32> gearList)
+    {
+        for (auto item : gearList)
+        {
+            ItemPrototype const* proto = ObjectMgr::GetItemPrototype(item);
+            if (!proto)
+                continue;
+
+            // don't check for quiver/ammo pouch
+            if (proto->InventoryType == INVTYPE_BAG || item == 23197)
+                continue;
+
+            if (player->HasItemCount(item, 1))
+                return true;
+        }
+
+        return false;
+    }
+
+    void RemoveStarterSet(Player* player, std::vector<uint32> gearList)
+    {
+        for (auto item : gearList)
+        {
+            ItemPrototype const* proto = ObjectMgr::GetItemPrototype(item);
+            if (!proto)
+                continue;
+
+            // don't check for quiver/ammo pouch
+            if (proto->InventoryType == INVTYPE_BAG)
+                continue;
+
+            player->DestroyItemCount(item, 2, true, false);
+        }
+    }
+
+    void GivePlayerItems(Player* recipient, std::vector<uint32> gearList)
+    {
+        bool allSuccess = true;
+        bool alreadyHave = false;
+        for (auto item : gearList)
+        {
+            ItemPrototype const* proto = ObjectMgr::GetItemPrototype(item);
+            if (!proto)
+                continue;
+
+            if (recipient->HasItemCount(item, (proto->InventoryType != INVTYPE_FINGER && proto->InventoryType != INVTYPE_WEAPON) ? 1 : 2))
+            {
+                alreadyHave = true;
+                continue;
+            }
+
+            if (!recipient->StoreNewItemInBestSlots(item, 1))
+                allSuccess = false;
+        }
+
+        if (alreadyHave)
+            m_creature->MonsterWhisper("There are already some pieces of starter gear in your possession. You must destroy it first before I can give you more!", recipient);
+
+        if (!allSuccess)
+            m_creature->MonsterWhisper("You can't hold some of the gear I'm trying to give you! Make room for it first and speak to me again.", recipient);
+        else
+            m_creature->MonsterWhisper("This equipment will serve you well in battle.", recipient);
+    }
+
+    bool TaxiNodesKnown(Player& player) const
+    {
+        switch (uint32(player.GetTeam()))
+        {
+        case ALLIANCE:
+            for (uint32 node : TaxiNodesAlliance)
+            {
+                if (!player.m_taxi.IsTaximaskNodeKnown(node))
+                    return false;
+            }
+            break;
+        case HORDE:
+            for (uint32 node : TaxiNodesHorde)
+            {
+                if (!player.m_taxi.IsTaximaskNodeKnown(node))
+                    return false;
+            }
+            break;
+        }
+        return true;
+    }
+
+    void TaxiNodesTeach(Player& player) const
+    {
+        // Vanilla taxi nodes
+
+        switch (uint32(player.GetTeam()))
+        {
+        case ALLIANCE:
+            for (uint32 node : TaxiNodesAlliance)
+                player.m_taxi.SetTaximaskNode(node);
+            break;
+        case HORDE:
+            for (uint32 node : TaxiNodesHorde)
+                player.m_taxi.SetTaximaskNode(node);
+            break;
+        }
+    }
+};
+
+bool GossipHello_npc_enlistment_officer(Player* player, Creature* creature)
+{
+    if (npc_enlistment_officerAI* enlistmentOfficerAI = dynamic_cast<npc_enlistment_officerAI*>(creature->AI()))
+    {
+        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TRAINER, "Train talent spell ranks", GOSSIP_SENDER_MAIN, GOSSIP_OPTION_TRAINER);
+
+        if (player->getLevel() >= 60)
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|cFF0008E8Full \"best in slot\" gear - Classic|r", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2000);
+
+        if (enlistmentOfficerAI->HasStarterSet(player, enlistmentOfficerAI->FullGearListBiS60))
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|cFF8B0000Remove all level 60 BiS gear.|r", GOSSIP_SENDER_MAIN, 93);
+
+        uint32 groundMount = enlistmentOfficerAI->GetStarterEpicMountForRace(player);
+        if ((!player->HasItemCount(groundMount, 1)) && player->getLevel() == 60)
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "I seem to be missing my mount. Can you give me one?", GOSSIP_SENDER_MAIN, 96);
+
+        if (player->GetAreaId() != 72)
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TAXI, "Teleport to Blasted Lands (Dark Portal)", GOSSIP_SENDER_MAIN, 90);
+
+        if (!enlistmentOfficerAI->TaxiNodesKnown(*player))
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TAXI, "Learn Azeroth flight paths", GOSSIP_SENDER_MAIN, 97);
+
+        if (player->getClass() == CLASS_HUNTER)
+        {
+            if (!player->GetPet())
+                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TALK, "Pet Menu", GOSSIP_SENDER_MAIN, 30);
+            else if (player->GetPet()->m_spells.size() >= 1)
+                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Untrain Pet", GOSSIP_SENDER_MAIN, 499);
+        }
+
+        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_VENDOR, "Basic Supplies", GOSSIP_SENDER_MAIN, GOSSIP_OPTION_VENDOR);
+
+        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Unlearn Talents", GOSSIP_SENDER_MAIN, 500);
+
+        if (player->GetMoney() < 100000000)
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_MONEY_BAG, "I need money!", GOSSIP_SENDER_MAIN, 600);
+        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Reset my dungeon/raid lockouts.", GOSSIP_SENDER_MAIN, 700);
+
+        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TAXI, "Teleport to Test Realm Overlord", GOSSIP_SENDER_MAIN, 89);
+        if (player->getLevel() < 60)
+            player->SEND_GOSSIP_MENU(GOSSIP_TEXT_REFUSE_LOW, creature->GetObjectGuid());
+        else
+            player->SEND_GOSSIP_MENU(GOSSIP_TEXT_GREET, creature->GetObjectGuid());
+    }
+    return true;
+}
+
+bool GossipSelect_npc_enlistment_officer(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 action)
+{
+    player->PlayerTalkClass->ClearMenus();
+    Pet* pPet = player->GetPet();
+
+    if (npc_enlistment_officerAI* enlistmentOfficerAI = dynamic_cast<npc_enlistment_officerAI*>(creature->AI()))
+    {
+        // Main Menu
+        if (action == 29)
+            GossipHello_npc_enlistment_officer(player, creature);
+
+        // Pets - Page 1
+        else if (action == 30)
+        {
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "<- Back to Main Menu", GOSSIP_SENDER_MAIN, 29);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Next Page ->", GOSSIP_SENDER_MAIN, 31);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Bat", GOSSIP_SENDER_MAIN, 501);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Bear", GOSSIP_SENDER_MAIN, 502);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Boar", GOSSIP_SENDER_MAIN, 503);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Carrion Bird", GOSSIP_SENDER_MAIN, 504);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Cat", GOSSIP_SENDER_MAIN, 505);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Crab", GOSSIP_SENDER_MAIN, 506);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Crocolisk", GOSSIP_SENDER_MAIN, 507);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Gorilla", GOSSIP_SENDER_MAIN, 508);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Hyena", GOSSIP_SENDER_MAIN, 509);
+            player->SEND_GOSSIP_MENU(GOSSIP_TEXT_PET_MENU, creature->GetObjectGuid());
+        }
+
+        // Pets - Page 2
+        else if (action == 31)
+        {
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "<- Back to Main Menu", GOSSIP_SENDER_MAIN, 29);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "<- Previous Page", GOSSIP_SENDER_MAIN, 30);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Owl", GOSSIP_SENDER_MAIN, 510);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Raptor", GOSSIP_SENDER_MAIN, 511);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Strider", GOSSIP_SENDER_MAIN, 512);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Scorpid", GOSSIP_SENDER_MAIN, 513);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Serpent", GOSSIP_SENDER_MAIN, 514);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Spider", GOSSIP_SENDER_MAIN, 515);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Turtle", GOSSIP_SENDER_MAIN, 516);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Wolf", GOSSIP_SENDER_MAIN, 517);
+            player->SEND_GOSSIP_MENU(GOSSIP_TEXT_PET_MENU, creature->GetObjectGuid());
+        }
+
+        else if (action == GOSSIP_OPTION_VENDOR)
+            player->GetSession()->SendListInventory(creature->GetObjectGuid());
+
+        else if (action == GOSSIP_OPTION_TRAINER)
+            player->GetSession()->SendTrainerList(creature->GetObjectGuid());
+
+        // Teleport - Test Realm Overlord
+        else if (action == 89)
+        {
+            player->CLOSE_GOSSIP_MENU();
+            switch (player->getRace())
+            {
+            case RACE_HUMAN:
+                player->TeleportTo(teleLocs[2].map, teleLocs[2].x, teleLocs[2].y, teleLocs[2].z, teleLocs[2].o);
+                break;
+            case RACE_DWARF:
+            case RACE_GNOME:
+                player->TeleportTo(teleLocs[3].map, teleLocs[3].x, teleLocs[3].y, teleLocs[3].z, teleLocs[3].o);
+                break;
+            case RACE_NIGHTELF:
+                player->TeleportTo(teleLocs[4].map, teleLocs[4].x, teleLocs[4].y, teleLocs[4].z, teleLocs[4].o);
+                break;
+            case RACE_TROLL:
+            case RACE_ORC:
+                player->TeleportTo(teleLocs[5].map, teleLocs[5].x, teleLocs[5].y, teleLocs[5].z, teleLocs[5].o);
+                break;
+            case RACE_UNDEAD:
+                player->TeleportTo(teleLocs[6].map, teleLocs[6].x, teleLocs[6].y, teleLocs[6].z, teleLocs[6].o);
+                break;
+            case RACE_TAUREN:
+                player->TeleportTo(teleLocs[7].map, teleLocs[7].x, teleLocs[7].y, teleLocs[7].z, teleLocs[7].o);
+                break;
+            }
+        }
+        // Teleport - Blasted Lands (Dark Portal)
+        else if (action == 90)
+        {
+            player->CLOSE_GOSSIP_MENU();
+            if (player->GetTeam() == ALLIANCE)
+                player->TeleportTo(teleLocs[0].map, teleLocs[0].x, teleLocs[0].y, teleLocs[0].z, teleLocs[0].o);
+            else
+                player->TeleportTo(teleLocs[1].map, teleLocs[1].x, teleLocs[1].y, teleLocs[1].z, teleLocs[1].o);
+        }
+
+        // Remove Starter Set - BiS 60
+        else if (action == 93)
+        {
+            enlistmentOfficerAI->RemoveStarterSet(player, enlistmentOfficerAI->FullGearListBiS60);
+            player->CLOSE_GOSSIP_MENU();
+        }
+
+        // Add Starter Mount
+        else if (action == 96)
+        {
+            uint32 groundMount = enlistmentOfficerAI->GetStarterEpicMountForRace(player);
+            if (!player->HasItemCount(groundMount, 1)) player->StoreNewItemInBestSlots(groundMount, 1);
+            player->PlayerTalkClass->CloseGossip();
+        }
+
+        // Learn Flight Paths
+        else if (action == 97)
+        {
+            enlistmentOfficerAI->TaxiNodesTeach(*player);
+            player->SetFacingToObject(creature);
+            player->HandleEmote(EMOTE_ONESHOT_SALUTE);
+            player->CastSpell(player, SPELL_CYCLONE_VISUAL_SPAWN, TRIGGERED_OLD_TRIGGERED);
+            player->PlayerTalkClass->CloseGossip();
+        }
+
+        // Untrain Pet
+        else if (action == 499)
+        {
+            player->PlayerTalkClass->CloseGossip();
+
+            if (pPet && pPet->m_spells.size() >= 1)
+            {
+                CharmInfo* charmInfo = pPet->GetCharmInfo();
+                if (charmInfo)
+                {
+                    for (PetSpellMap::iterator itr = pPet->m_spells.begin(); itr != pPet->m_spells.end();)
+                    {
+                        uint32 spell_id = itr->first;
+                        ++itr;
+                        pPet->unlearnSpell(spell_id, false);
+                    }
+
+                    uint32 cost = pPet->resetTalentsCost();
+
+                    pPet->SetTP(pPet->getLevel() * (pPet->GetLoyaltyLevel() - 1));
+
+                    for (int i = 0; i < MAX_UNIT_ACTION_BAR_INDEX; ++i)
+                        if (UnitActionBarEntry const* ab = charmInfo->GetActionBarEntry(i))
+                            if (ab->GetAction() && ab->IsActionBarForSpell())
+                                charmInfo->SetActionBar(i, 0, ACT_DISABLED);
+
+                    // relearn pet passives
+                    pPet->LearnPetPassives();
+
+                    pPet->m_resetTalentsTime = time(nullptr);
+                    pPet->m_resetTalentsCost = cost;
+
+                    player->PetSpellInitialize();
+                }
+            }
+        }
+
+        // Unlearn Talents
+        else if (action == 500)
+        {
+            player->PlayerTalkClass->CloseGossip();
+            player->resetTalents(true);
+        }
+        // Money!
+        else if (action == 600)
+        {
+            player->PlayerTalkClass->CloseGossip();
+            player->ModifyMoney(INT_MAX);
+        }
+        // Unbind Instances
+        else if (action == 700)
+        {
+            player->PlayerTalkClass->CloseGossip();
+            Player::BoundInstancesMap& binds = player->GetBoundInstances();
+            for (Player::BoundInstancesMap::iterator itr = binds.begin(); itr != binds.end();)
+            {
+                if (itr->first != player->GetMapId())
+                {
+                    DungeonPersistentState* save = itr->second.state;
+                    std::string timeleft = secsToTimeString(save->GetResetTime() - time(nullptr), true);
+                    player->UnbindInstance(itr);
+                }
+                else
+                    ++itr;
+            }
+        }
+
+        else if (action == 501) enlistmentOfficerAI->CreatePet(player, creature, NPC_PET_BAT);
+        else if (action == 502) enlistmentOfficerAI->CreatePet(player, creature, NPC_PET_BEAR);
+        else if (action == 503) enlistmentOfficerAI->CreatePet(player, creature, NPC_PET_BOAR);
+        else if (action == 504) enlistmentOfficerAI->CreatePet(player, creature, NPC_PET_CARRION);
+        else if (action == 505) enlistmentOfficerAI->CreatePet(player, creature, NPC_PET_CAT);
+        else if (action == 506) enlistmentOfficerAI->CreatePet(player, creature, NPC_PET_CRAB);
+        else if (action == 507) enlistmentOfficerAI->CreatePet(player, creature, NPC_PET_CROC);
+        else if (action == 508) enlistmentOfficerAI->CreatePet(player, creature, NPC_PET_GORILLA);
+        else if (action == 509) enlistmentOfficerAI->CreatePet(player, creature, NPC_PET_HYENA);
+        else if (action == 510) enlistmentOfficerAI->CreatePet(player, creature, NPC_PET_OWL);
+        else if (action == 511) enlistmentOfficerAI->CreatePet(player, creature, NPC_PET_RAPTOR);
+        else if (action == 512) enlistmentOfficerAI->CreatePet(player, creature, NPC_PET_STRIDER);
+        else if (action == 513) enlistmentOfficerAI->CreatePet(player, creature, NPC_PET_SCORPID);
+        else if (action == 514) enlistmentOfficerAI->CreatePet(player, creature, NPC_PET_SERPENT);
+        else if (action == 515) enlistmentOfficerAI->CreatePet(player, creature, NPC_PET_SPIDER);
+        else if (action == 516) enlistmentOfficerAI->CreatePet(player, creature, NPC_PET_TURTLE);
+        else if (action == 517) enlistmentOfficerAI->CreatePet(player, creature, NPC_PET_WOLF);
+
+        // Classic Full Best in Slot
+        // Pure DPS classes Hunter, Rogue, Mage, and Warlock don't require a secondary selection
+        switch (action)
+        {
+        case GOSSIP_ACTION_INFO_DEF + 2000:
+        {
+            switch (player->getClass())
+            {
+            case CLASS_ROGUE:
+                enlistmentOfficerAI->GivePlayerItems(player, Lvl60BiS_Rogue);
+                player->CLOSE_GOSSIP_MENU();
+                break;
+            case CLASS_MAGE:
+                enlistmentOfficerAI->GivePlayerItems(player, Lvl60BiS_Mage);
+                player->CLOSE_GOSSIP_MENU();
+                break;
+            case CLASS_HUNTER:
+                enlistmentOfficerAI->GivePlayerItems(player, Lvl60BiS_Hunter);
+                player->CLOSE_GOSSIP_MENU();
+                break;
+            case CLASS_WARLOCK:
+                enlistmentOfficerAI->GivePlayerItems(player, Lvl60BiS_Warlock);
+                player->CLOSE_GOSSIP_MENU();
+                break;
+            case CLASS_SHAMAN:
+                player->PrepareGossipMenu(creature, GOSSIP_TEXT_PICK_SPEC);
+                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Restoration", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2001);
+                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Enhancement", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2002);
+                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Elemental", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2003);
+                player->SendPreparedGossip(creature);
+                break;
+            case CLASS_PRIEST:
+                player->PrepareGossipMenu(creature, GOSSIP_TEXT_PICK_SPEC);
+                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Shadow", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2004);
+                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Discipline/Holy", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2005);
+                player->SendPreparedGossip(creature);
+                break;
+            case CLASS_PALADIN:
+                player->PrepareGossipMenu(creature, GOSSIP_TEXT_PICK_SPEC);
+                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Holy", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2006);
+                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Retribution", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2007);
+                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Protection", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2008);
+                player->SendPreparedGossip(creature);
+                break;
+            case CLASS_WARRIOR:
+                player->PrepareGossipMenu(creature, GOSSIP_TEXT_PICK_SPEC);
+                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Fury/Arms", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2009);
+                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Protection", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2010);
+                player->SendPreparedGossip(creature);
+                break;
+            case CLASS_DRUID:
+                player->PrepareGossipMenu(creature, GOSSIP_TEXT_PICK_SPEC);
+                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Feral (Cat/DPS)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2011);
+                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Feral (Bear/Tank)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2012);
+                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Balance", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2013);
+                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Restoration", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2014);
+                player->SendPreparedGossip(creature);
+                break;
+            }
+            break;
+        }
+        // Classic Full Best in Slot (Spec Selected)
+        // Shaman - Restoration
+        case GOSSIP_ACTION_INFO_DEF + 2001: enlistmentOfficerAI->GivePlayerItems(player, Lvl60BiS_ShamanResto); player->PlayerTalkClass->CloseGossip(); break;
+            // Shaman - Enhancement
+        case GOSSIP_ACTION_INFO_DEF + 2002: enlistmentOfficerAI->GivePlayerItems(player, Lvl60BiS_ShamanEnhancement); player->PlayerTalkClass->CloseGossip(); break;
+            // Shaman - Elemental
+        case GOSSIP_ACTION_INFO_DEF + 2003: enlistmentOfficerAI->GivePlayerItems(player, Lvl60BiS_ShamanElemental); player->PlayerTalkClass->CloseGossip(); break;
+            // Priest - Shadow
+        case GOSSIP_ACTION_INFO_DEF + 2004: enlistmentOfficerAI->GivePlayerItems(player, Lvl60BiS_PriestShadow); player->PlayerTalkClass->CloseGossip(); break;
+            // Priest - Discipline/Holy
+        case GOSSIP_ACTION_INFO_DEF + 2005: enlistmentOfficerAI->GivePlayerItems(player, Lvl60BiS_PriestDiscHoly); player->PlayerTalkClass->CloseGossip(); break;
+            // Paladin - Holy
+        case GOSSIP_ACTION_INFO_DEF + 2006: enlistmentOfficerAI->GivePlayerItems(player, Lvl60BiS_PaladinHoly); player->PlayerTalkClass->CloseGossip(); break;
+            // Paladin - Retribution
+        case GOSSIP_ACTION_INFO_DEF + 2007: enlistmentOfficerAI->GivePlayerItems(player, Lvl60BiS_PaladinRetribution); player->PlayerTalkClass->CloseGossip(); break;
+            // Paladin - Protection
+        case GOSSIP_ACTION_INFO_DEF + 2008: enlistmentOfficerAI->GivePlayerItems(player, Lvl60BiS_PaladinProtection); player->PlayerTalkClass->CloseGossip(); break;
+            // Warrior - Fury/Arms
+        case GOSSIP_ACTION_INFO_DEF + 2009: enlistmentOfficerAI->GivePlayerItems(player, Lvl60BiS_WarriorFuryArms); player->PlayerTalkClass->CloseGossip(); break;
+            // Warrior - Protection
+        case GOSSIP_ACTION_INFO_DEF + 2010: enlistmentOfficerAI->GivePlayerItems(player, Lvl60BiS_WarriorProtection); player->PlayerTalkClass->CloseGossip(); break;
+            // Druid - Feral (Cat/DPS)
+        case GOSSIP_ACTION_INFO_DEF + 2011: enlistmentOfficerAI->GivePlayerItems(player, Lvl60BiS_DruidFeralCat); player->PlayerTalkClass->CloseGossip(); break;
+            // Druid - Feral (Bear/Tank)
+        case GOSSIP_ACTION_INFO_DEF + 2012: enlistmentOfficerAI->GivePlayerItems(player, Lvl60BiS_DruidFeralBear); player->PlayerTalkClass->CloseGossip(); break;
+            // Druid - Balance
+        case GOSSIP_ACTION_INFO_DEF + 2013: enlistmentOfficerAI->GivePlayerItems(player, Lvl60BiS_DruidBalance); player->PlayerTalkClass->CloseGossip(); break;
+            // Druid - Restoration
+        case GOSSIP_ACTION_INFO_DEF + 2014: enlistmentOfficerAI->GivePlayerItems(player, Lvl60BiS_DruidResto); player->PlayerTalkClass->CloseGossip(); break;
+        }
+    }
+
+    return true;
+}
+
+UnitAI* GetAI_npc_enlistment_officer(Creature* creature)
+{
+    return new npc_enlistment_officerAI(creature);
+}
+
 void AddSC_npcs_special()
 {
     Script* pNewScript;
@@ -1348,5 +2234,19 @@ void AddSC_npcs_special()
     pNewScript->Name = "npc_enchantment_crystal";
     pNewScript->pGossipHello = &GossipHello_npc_enchantment_crystal;
     pNewScript->pGossipSelect = &GossipSelect_npc_enchantment_crystal;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "npc_enlistment_officer";
+    pNewScript->GetAI = &GetAI_npc_enlistment_officer;
+    pNewScript->pGossipHello = &GossipHello_npc_enlistment_officer;
+    pNewScript->pGossipSelect = &GossipSelect_npc_enlistment_officer;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "npc_test_realm_overlord";
+    pNewScript->GetAI = &GetNewAIInstance<npc_test_realm_overlord>;
+    pNewScript->pGossipHello = &GossipHello_npc_test_realm_overlord;
+    pNewScript->pGossipSelect = &GossipSelect_npc_test_realm_overlord;
     pNewScript->RegisterSelf();
 }

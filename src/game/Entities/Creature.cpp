@@ -888,7 +888,8 @@ bool Creature::IsTrainerOf(Player* pPlayer, bool msg) const
                         case CLASS_WARRIOR: pPlayer->PlayerTalkClass->SendGossipMenu(4985, GetObjectGuid()); break;
                     }
                 }
-                return false;
+                if (GetEntry() != 100503) // Allow Master Provisioner to still train regardless (custom helper NPC)
+                    return false;
             }
             break;
         case TRAINER_TYPE_PETS:
